@@ -8,6 +8,9 @@ from collections import defaultdict
 
 from math import ceil
 import lt_sampler
+ 
+#TODO: program output at termination to mirror TA binary
+
 
 #FIXME: convert to namedtuple
 class CheckNode(object):

@@ -22,7 +22,7 @@ Decoding
 Performance
 -----------
 
-    The performance of this implementation is pretty solid. The reference implementation in Go wins handily on very small files, but the speed of my encoder/decoder pair scales very favorably in comparison, winning by a factor of 4 on a dataset 10k times as large. I am not sure how the reference implementation decoder is written, but this could be a manifestation of an asymptotic difference. If the reference decoder uses a more naive decoding scheme in which work is done in batches rather than an online fashion, this could result in substantial overhead when more blocks are in flight.
+    The performance of this implementation is pretty solid. The reference implementation in Go wins handily on very small files, but the speed of my encoder/decoder pair scales very favorably in comparison, winning by a factor of 4 on a dataset 10k times as large. I am not sure how the reference implementation decoder is written, but this could be a manifestation of an asymptotic difference or some uncharacteristically high overhead in the Go implementation relative to the Python here. 
 
 Difficulties
 -----------
@@ -38,3 +38,13 @@ Bugs
 ------------
 
     No bugs are known to exist in these programs. Compatability with the reference implementations has been tested, and the encoder has been verified to comply with the expected sequences listed at the end of the assignment specification.
+
+Usage
+------------
+
+    To run the encoder, invoke the following from the shell
+    $ ./encoder.py <file> <blocksize> <seed> [c] [delta]
+
+    To run the decoder, run the following
+    $ ./decoder.py <drop-rate>
+    where <drop-rate> is written as a decimal probability of a block being dropped in transmission

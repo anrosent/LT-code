@@ -41,8 +41,13 @@ def write_out(block):
 # Run that ish
 def run(fn, blocksize, seed, c, delta):
     encoder = lt_encoder(fn, blocksize, seed, c, delta)
-    for block in encoder:
-        sys.stdout.buffer.write(pack('!III%ss'%blocksize, *block))
+    try:
+        for block in encoder:
+            sys.stdout.buffer.write(pack('!III%ss'%blocksize, *block))
+    except (Exception) as e:
+        sys.stdout.write = lambda s:None
+        sys.stdout.flush = lambda:None
+        sys.exit(0)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -64,4 +69,7 @@ if __name__ == '__main__':
                                  help='degree sampling distribution tuning parameter')
     args = parser.parse_args()
 
-    run(args.file, args.blocksize, args.seed, args.c, args.delta)
+    try:
+        run(args.file, args.blocksize, args.seed, args.c, args.delta)
+    except IOError:
+        print("Decoder has cut off transmission. Fountain closed.", file=sys.stderr)

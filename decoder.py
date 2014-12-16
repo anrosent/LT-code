@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import sys
+import time
+
 from struct import unpack
 from random import random
 from ctypes import c_int
@@ -38,9 +40,12 @@ class BlockGraph(object):
                 if node in self.eliminated:
                     nodes.remove(node)
                     data ^= self.eliminated[node]
-            check = CheckNode(nodes, data)
-            for node in nodes:
-                self.checks[node].append(check)
+            if len(nodes) == 1:
+                return self.add_block(nodes, data)
+            else:
+                check = CheckNode(nodes, data)
+                for node in nodes:
+                    self.checks[node].append(check)
         return len(self.eliminated) >= self.num_blocks
 
     def eliminate(self, node, data):
@@ -65,26 +70,54 @@ def read_blocks(stream, drop_rate):
     while True:
         header = read_header(stream)
         block  = read_block(header[1], stream)
-        if random() > drop_rate:
-            yield (header, block)
+        yield (header, block)
 
 def handle_block(src_blocks, block, block_graph):
     return block_graph.add_block(src_blocks, block)
 
 def decode(drop_rate, stream=sys.stdin.buffer):
+
+    # init stuff
+    time_start = time.time()
+    total_size = 0
+
+    # data structures
     block_graph = None
     prng = None
+
+    # counters
+    blocks_received, blocks_dropped = 0, 0
+    bytes_received = 0
+
+    # Begin forever loop
     for (filesize, blocksize, blockseed), block in read_blocks(stream, drop_rate):
+
+        # drop some packets
+        if random() < drop_rate:
+            blocks_dropped  += 1
+            continue
+
+        blocks_received += 1
+        bytes_received += blocksize
+
+        # first time around
         if not prng:
+            total_size = filesize
+
             K = ceil(filesize/blocksize)
             prng = lt_sampler.PRNG(params=(K, lt_sampler.PRNG_DELTA, lt_sampler.PRNG_C))
             block_graph = BlockGraph(K)
 
         _, _, src_blocks = prng.get_src_blocks(seed=blockseed)
-        #print("Header:(%s,%s,%s), Blocks:%s" % (filesize, blocksize, blockseed, src_blocks))
+
+        # If BP is done, stop
         if handle_block(src_blocks, block, block_graph):
             break
-    #TODO: remove junk data at end
+    
+    # Stop the timer
+    time_end = time.time()
+
+    # Iterate through blocks, stopping before padding junk
     for ix, block_str in enumerate(map(lambda p: int.to_bytes(p[1], blocksize, 'big').decode('utf8'), 
             sorted(block_graph.eliminated.items(), key = lambda p:p[0]))):
         if ix < K-1:
@@ -92,6 +125,25 @@ def decode(drop_rate, stream=sys.stdin.buffer):
         else:
             sys.stdout.write(block_str[:filesize%blocksize])
 
+    # Compute some stats
+    time_elapsed = (time_end - time_start) * 1000
+    
+    #NOTE: summary stats break when blocks are of different sizes
+    rate = total_size / bytes_received
+    # Report summary stats on transmission 
+    if time_elapsed > 1000:
+        print("Transmission Time: %.4fs" % (time_elapsed / 1000), file=sys.stderr)
+    else:
+        print("Transmission Time: %.4fms" % time_elapsed, file=sys.stderr)
+    print("Total size:        %d" % total_size, file=sys.stderr)
+    print("Packet Stats:", file=sys.stderr)
+    print("\tPackets Received:  %d" % (blocks_received + blocks_dropped), file=sys.stderr)
+    print("\tPackets Processed: %d" % blocks_received, file=sys.stderr)
+    print("\tPackets Dropped:   %d" % blocks_dropped, file=sys.stderr)
+    print("Data Stats", file=sys.stderr)
+    print("\tBytes/packet: %d" % (bytes_received / blocks_received) , file=sys.stderr)
+    print("\tBytes Total:  %d" % bytes_received, file=sys.stderr)
+    print("Code Rate: %1.4f" % rate, file=sys.stderr)
        
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ import argparse
 import sys
 import time
 
-from struct import unpack
+from struct import unpack, error
 from random import random
 from ctypes import c_int
 from collections import defaultdict
@@ -151,4 +151,7 @@ if __name__ == '__main__':
     parser.add_argument('drop_rate', type=float,
                                      help='the probability of a transmitted block being dropped')
     args = parser.parse_args()
-    decode(args.drop_rate)
+    try:
+        decode(args.drop_rate)
+    except error:
+        print("Decoder got some invalid data. Try again.", file=sys.stderr)

@@ -43,8 +43,8 @@ Usage
 ------------
 
     To run the encoder, invoke the following from the shell
-    $ ./encoder.py <file> <blocksize> <seed> [c] [delta]
+    $ ./encoder <file> <blocksize> <seed> [c] [delta]
 
     To run the decoder, run the following
-    $ ./decoder.py <drop-rate>
+    $ ./decoder <drop-rate>
     where <drop-rate> is written as a decimal probability of a block being dropped in transmission

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os.path
 import argparse
 import sys
 import time
@@ -41,13 +42,8 @@ def write_out(block):
 # Run that ish
 def run(fn, blocksize, seed, c, delta):
     encoder = lt_encoder(fn, blocksize, seed, c, delta)
-    try:
-        for block in encoder:
-            sys.stdout.buffer.write(pack('!III%ss'%blocksize, *block))
-    except (Exception) as e:
-        sys.stdout.write = lambda s:None
-        sys.stdout.flush = lambda:None
-        sys.exit(0)
+    for block in encoder:
+        sys.stdout.buffer.write(pack('!III%ss'%blocksize, *block))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -69,7 +65,14 @@ if __name__ == '__main__':
                                  help='degree sampling distribution tuning parameter')
     args = parser.parse_args()
 
+    if not os.path.exists(args.file):
+        print("File %s doesn't exist. Try again." % args.file, file=sys.stderr)
+        sys.exit(1)
+    
     try:
         run(args.file, args.blocksize, args.seed, args.c, args.delta)
-    except IOError:
+    except (GeneratorExit, BrokenPipeError):
         print("Decoder has cut off transmission. Fountain closed.", file=sys.stderr)
+        sys.stdout.write = lambda s:None
+        sys.stdout.flush = lambda:None
+        sys.exit(0)

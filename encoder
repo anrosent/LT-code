@@ -71,7 +71,7 @@ if __name__ == '__main__':
     
     try:
         run(args.file, args.blocksize, args.seed, args.c, args.delta)
-    except (GeneratorExit, BrokenPipeError):
+    except (GeneratorExit, IOError):
         print("Decoder has cut off transmission. Fountain closed.", file=sys.stderr)
         sys.stdout.write = lambda s:None
         sys.stdout.flush = lambda:None

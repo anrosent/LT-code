@@ -43,6 +43,7 @@ def gen_mu(K, delta, c):
     """The Robust Soliton Distribution on the degree of 
     transmitted blocks
     """
+
     S = c * log(K/delta) * sqrt(K) 
     tau = gen_tau(S, K, delta)
     rho = gen_rho(K)
@@ -52,6 +53,7 @@ def gen_mu(K, delta, c):
 def gen_rsd_cdf(K, delta, c):
     """The CDF of the RSD on block degree, precomputed for
     sampling speed"""
+
     mu = gen_mu(K, delta, c)
     return [sum(mu[:d+1]) for d in range(K)]
 
@@ -61,23 +63,43 @@ class PRNG(object):
     from the set of source blocks using the RSD degree
     distribution described above.
     """
+
     def __init__(self, params):
+        """Provide RSD parameters on construction
+        """
+
         K, delta, c = params
         self.K = K
         self.cdf = gen_rsd_cdf(K, delta, c)
 
     def set_seed(self, seed):
+        """Reset the state of the PRNG to the 
+        given seed
+        """
+
         self.seed = seed
         self.state = seed
 
     def get_next(self):
+        """Executes the next iteration of the PRNG
+        evolution process, and returns the result
+        """
+
         self.state = PRNG_A * self.state % PRNG_M
         return self.state
     
     def get_state(self):
+        """Returns current state of the linear PRNG
+        """
+
         return self.state
 
     def get_src_blocks(self, seed=None):
+        """Returns the indices of a set of `d` source blocks
+        sampled from indices i = 1, ..., K-1 uniformly, where
+        `d` is sampled from the RSD described above.
+        """
+
         if seed:
             self.state = seed
 
@@ -94,6 +116,10 @@ class PRNG(object):
 
     # Samples from the CDF of mu
     def _sample_d(self):
+        """Samples degree given the precomputed
+        distributions above and the linear PRNG output
+        """
+
         p = self.get_next() / PRNG_MAX_RAND
         for ix, v in enumerate(self.cdf):
             if v > p:

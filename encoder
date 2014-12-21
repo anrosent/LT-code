@@ -1,4 +1,22 @@
 #!/usr/bin/env python3
+"""Implementation of a Luby Transform encoder.
+
+This is a type of fountain code, which deals with lossy channels by 
+sending an infinite stream of statistically correllated packets generated
+from a set of blocks into which the source data is divided. In this way, 
+epensive retransmissions are unecessary, as the receiver will be able 
+to reconstruct the file with high probability after receiving only 
+slightly more blocks than one would have to transmit sending the raw
+blocks over a lossless channel.
+
+See 
+
+D.J.C, MacKay, 'Information theory, inference, and learning algorithms'.
+Cambridge University Press, 2003
+
+for reference.
+"""
+
 import os.path
 import argparse
 import sys
@@ -8,14 +26,20 @@ from struct import pack
 
 import lt_sampler
 
-# Block file byte contents into blocksize chunks, padding last one if necessary
 def get_blocks(f, blocksize):
+    """Block file byte contents into blocksize chunks, padding last one if necessary
+    """
+
     f_bytes = f.read()
-    blocks = [int.from_bytes(f_bytes[i:i+blocksize].ljust(blocksize, b'0'), sys.byteorder) for i in range(0, len(f_bytes), blocksize)]
+    blocks = [int.from_bytes(f_bytes[i:i+blocksize].ljust(blocksize, b'0'), sys.byteorder) 
+            for i in range(0, len(f_bytes), blocksize)]
     return len(f_bytes), blocks
 
-# Generator of blocks
-def lt_encoder(fn, blocksize, seed, c, delta):
+
+def encoder(fn, blocksize, seed, c, delta):
+    """Generates an infinite sequence of blocks to transmit
+    to the receiver
+    """
 
     # get file blocks
     with open(fn, 'rb') as f:
@@ -36,13 +60,12 @@ def lt_encoder(fn, blocksize, seed, c, delta):
         # Generate blocks of XORed data in network byte order
         yield (filesize, blocksize, blockseed, int.to_bytes(block_data, blocksize, 'big'))
 
-def write_out(block):
-    sys.stdout.buffer.write(pack('!IIIs', *block))
-
-# Run that ish
 def run(fn, blocksize, seed, c, delta):
-    encoder = lt_encoder(fn, blocksize, seed, c, delta)
-    for block in encoder:
+    """Run the encoder until the channel is broken, signalling that the 
+    receiver has successfully reconstructed the file
+    """
+
+    for block in encoder(fn, blocksize, seed, c, delta):
         sys.stdout.buffer.write(pack('!III%ss'%blocksize, *block))
 
 if __name__ == '__main__':

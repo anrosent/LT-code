@@ -5,6 +5,7 @@
 |_____|_|    \____\___/ \__,_|\___||___/
 ===========
 anrosent
+Completed for Brown University course cs168: Computer Networks.
 
     This is an implementation of a Luby Transform code in Python, consisting of two executables, one for each encoding and decoding files. The sampling code is pulled into a library shared between the two executables.
 
@@ -18,26 +19,6 @@ Decoding
 -----------
     
     The decoder is essentially a loop that reads the header, then the body, of each incoming block and conducts all possible steps in the belief propagation algorithm on a representation of the source node/check node graph that become possible given the new check node. This is done using an online algorithm, which computes the appropriate messages incrementally and passes them eagerly as the value of source nodes is resolved. Thus, the program will terminate once it has read only as many blocks is necessary in the stream to decode the file, and it seems to scale well as the file size, block size, and drop rate increase.
-
-Performance
------------
-
-    The performance of this implementation is pretty solid. The reference implementation in Go wins handily on very small files, but the speed of my encoder/decoder pair scales very favorably in comparison, winning by a factor of 4 on a dataset 10k times as large. I am not sure how the reference implementation decoder is written, but this could be a manifestation of an asymptotic difference or some uncharacteristically high overhead in the Go implementation relative to the Python here. 
-
-Difficulties
------------
-
-    Python's struct packing library `struct` was remarkably easy to use, and the abstractions it provides in the form of arbitrary-precision integers and the `bytes` interface were very convenient in dealing with operations on the necessary binary representations of the data. As a result, most of the implementation complexity was relieved. 
-
-Improvements
-------------
-
-    I am not aware of many asymptotic improvements to be made in my design, with the possible exception of cleverer data structures in the graph representation and manipulation functions used for decoding. Performance gains can definitely be made by pushing inner loops into lower level operations, for example using the Python C interface. Obviously, using a lower-level language like C or (god forbid) Rust could yied much better constant factors across the board.
-
-Bugs
-------------
-
-    No bugs are known to exist in these programs. Compatability with the reference implementations has been tested, and the encoder has been verified to comply with the expected sequences listed at the end of the assignment specification.
 
 Usage
 ------------

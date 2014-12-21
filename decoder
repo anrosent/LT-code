@@ -2,7 +2,6 @@
 import argparse
 import sys
 import time
-
 from struct import unpack, error
 from random import random
 from ctypes import c_int
@@ -11,10 +10,7 @@ from collections import defaultdict
 from math import ceil
 import lt_sampler
  
-#TODO: program output at termination to mirror TA binary
-
-
-#FIXME: convert to namedtuple
+# Check node in graph
 class CheckNode(object):
 
     def __init__(self, src_nodes, check):
@@ -22,6 +18,9 @@ class CheckNode(object):
         self.src_nodes = src_nodes
 
 class BlockGraph(object):
+    """Graph on which we run Belief Propagation to resolve 
+    source node data
+    """
     
     def __init__(self, num_blocks):
         self.checks = defaultdict(list)
@@ -29,53 +28,95 @@ class BlockGraph(object):
         self.eliminated = {}
 
     def add_block(self, nodes, data):
-        
+        """Adds a new check node and edges between that node and all
+        source nodes it connects, resolving all message passes that
+        become possible as a result.
+        """
+
+        # We can eliminate this source node
         if len(nodes) == 1:
             to_eliminate = list(self.eliminate(next(iter(nodes)), data))
+
+            # Recursively eliminate all nodes that can now be resolved
             while len(to_eliminate):
                 other, check = to_eliminate.pop()
                 to_eliminate.extend(self.eliminate(other, check))
         else:
+
+            # Pass messages from already-resolved source nodes
             for node in list(nodes):
                 if node in self.eliminated:
                     nodes.remove(node)
                     data ^= self.eliminated[node]
+
+            # Resolve if we are left with a single non-resolved source node
             if len(nodes) == 1:
                 return self.add_block(nodes, data)
             else:
+
+                # Add edges for all remaining nodes to this check
                 check = CheckNode(nodes, data)
                 for node in nodes:
                     self.checks[node].append(check)
+
+        # Are we done yet?
         return len(self.eliminated) >= self.num_blocks
 
     def eliminate(self, node, data):
+        """Resolves a source node, passing the message to all associated checks
+        """
+
+        # Cache resolved value
         self.eliminated[node] = data
         others = self.checks[node]
         del self.checks[node]
+
+        # Pass messages to all associated checks
         for check in others:
             check.check ^= data
             check.src_nodes.remove(node)
+
+            # Yield all nodes that can now be resolved
             if len(check.src_nodes) == 1:
                 yield (next(iter(check.src_nodes)), check.check)
 
+
 def read_header(stream):
+    """Read block header from network
+    """
     header_bytes = stream.read(12)
     return unpack('!III', header_bytes)
 
+
 def read_block(blocksize, stream):
+    """Read block data from network into integer type
+    """
     blockdata = stream.read(blocksize)
     return int.from_bytes(blockdata, 'big')
 
+
 def read_blocks(stream, drop_rate):
+    """Generate parsed blocks from input stream
+    """
     while True:
         header = read_header(stream)
         block  = read_block(header[1], stream)
         yield (header, block)
 
 def handle_block(src_blocks, block, block_graph):
+    """What to do with new block: add check and pass
+    messages in graph
+    """
     return block_graph.add_block(src_blocks, block)
 
+
 def decode(drop_rate, stream=sys.stdin.buffer):
+    """Reads from stream, applying the LT decoding algorithm
+    to incoming encoded blocks until sufficiently many blocks
+    have been received to reconstruct the entire file.
+
+    Simulates lossy channel via p(block dropped) = drop_rate
+    """
 
     # init stuff
     time_start = time.time()
@@ -100,7 +141,7 @@ def decode(drop_rate, stream=sys.stdin.buffer):
         blocks_received += 1
         bytes_received += blocksize
 
-        # first time around
+        # first time around, init things
         if not prng:
             total_size = filesize
 
@@ -108,6 +149,7 @@ def decode(drop_rate, stream=sys.stdin.buffer):
             prng = lt_sampler.PRNG(params=(K, lt_sampler.PRNG_DELTA, lt_sampler.PRNG_C))
             block_graph = BlockGraph(K)
 
+        # Run PRNG with given seed to figure out which blocks were XORed to make received data
         _, _, src_blocks = prng.get_src_blocks(seed=blockseed)
 
         # If BP is done, stop

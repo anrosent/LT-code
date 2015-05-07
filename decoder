@@ -162,7 +162,7 @@ def decode(drop_rate, stream=sys.stdin.buffer):
     # Iterate through blocks, stopping before padding junk
     for ix, block_str in enumerate(map(lambda p: int.to_bytes(p[1], blocksize, 'big').decode('utf8'), 
             sorted(block_graph.eliminated.items(), key = lambda p:p[0]))):
-        if ix < K-1:
+        if ix < K-1 or filesize % blocksize == 0:
             sys.stdout.write(block_str)
         else:
             sys.stdout.write(block_str[:filesize%blocksize])

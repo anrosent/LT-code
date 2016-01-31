@@ -92,7 +92,7 @@ def read_block(blocksize, stream):
     """Read block data from network into integer type
     """
     blockdata = stream.read(blocksize)
-    return int.from_bytes(blockdata, 'big')
+    return int.from_bytes(blockdata, sys.byteorder)
 
 
 def read_blocks(stream, drop_rate):

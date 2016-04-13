@@ -58,7 +58,7 @@ def encoder(fn, blocksize, seed, c, delta):
             block_data ^= blocks[ix]
 
         # Generate blocks of XORed data in network byte order
-        yield (filesize, blocksize, blockseed, int.to_bytes(block_data, blocksize, 'big'))
+        yield (filesize, blocksize, blockseed, int.to_bytes(block_data, blocksize, sys.byteorder))
 
 def run(fn, blocksize, seed, c, delta):
     """Run the encoder until the channel is broken, signalling that the 

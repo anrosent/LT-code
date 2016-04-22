@@ -1,19 +1,17 @@
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'My Project',
+    'description': 'An implementation of an Encoder and Decoder for the Luby Transform Fountain code. Useful for transmitting data over very lossy channels where retry-based transmission protocols struggle.',
     'author': 'Anson Rosenthal',
-    'url': 'URL to get it at.',
-    'download_url': 'Where to download it.',
+    'url': 'https://github.com/anrosent/LT-Code',
     'author_email': 'anson.rosenthal@gmail.com',
-    'version': '0.1',
-    'install_requires': ['nose'],
-    'packages': ['lt'],
+    'version': '0.2',
+    'packages': ['lt', 'lt.encoder', 'lt.decoder'],
     'scripts': [],
-    'name': 'lt'
+    'name': 'lt-code'
 }
 
 setup(**config)

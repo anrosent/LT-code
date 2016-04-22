@@ -18,13 +18,14 @@ Encoding
 Decoding
 -----------
     
-    The decoder is essentially a loop that reads the header, then the body, of each incoming block and conducts all possible steps in the belief propagation algorithm on a representation of the source node/check node graph that become possible given the new check node. This is done using an online algorithm, which computes the appropriate messages incrementally and passes them eagerly as the value of source nodes is resolved. Thus, the program will terminate once it has read only as many blocks is necessary in the stream to decode the file, and it seems to scale well as the file size, and block size increase.
+    The decoder is essentially a loop that reads the header, then the body, of each incoming block and conducts all possible steps in the belief propagation algorithm on a representation of the source node/check node graph that become possible given the new check node. This is done using an online algorithm, which computes the appropriate messages incrementally and passes them eagerly as the value of source nodes is resolved. Thus, the program will terminate once it has read only as many blocks is necessary in the stream to decode the file, and it seems to scale well as the file size, block size, and drop rate increase.
 
 Usage
 ------------
 
     To run the encoder, invoke the following from the shell
-    $ ./bin/encoder <file> <blocksize> <seed> [c] [delta]
+    $ ./encoder <file> <blocksize> <seed> [c] [delta]
 
     To run the decoder, run the following
-    $ ./bin/decoder 
+    $ ./decoder <drop-rate>
+    where <drop-rate> is written as a decimal probability of a block being dropped in transmission

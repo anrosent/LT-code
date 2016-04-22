@@ -16,60 +16,23 @@ Cambridge University Press, 2003
 
 for reference.
 """
-
 import os.path
 import argparse
 import sys
 import time
-import pdb
-from struct import pack
 
-import lt_sampler
-
-def get_blocks(f, blocksize):
-    """Block file byte contents into blocksize chunks, padding last one if necessary
-    """
-
-    f_bytes = f.read()
-    blocks = [int.from_bytes(f_bytes[i:i+blocksize].ljust(blocksize, b'0'), sys.byteorder) 
-            for i in range(0, len(f_bytes), blocksize)]
-    return len(f_bytes), blocks
-
-
-def encoder(fn, blocksize, seed, c, delta):
-    """Generates an infinite sequence of blocks to transmit
-    to the receiver
-    """
-
-    # get file blocks
-    with open(fn, 'rb') as f:
-        filesize, blocks = get_blocks(f, blocksize)
-
-    # init stream vars
-    K = len(blocks)
-    prng = lt_sampler.PRNG(params=(K, delta, c))
-    prng.set_seed(seed)
-
-    # block generation loop
-    while True:
-        blockseed, d, ix_samples = prng.get_src_blocks()
-        block_data = 0
-        for ix in ix_samples:
-            block_data ^= blocks[ix]
-
-        # Generate blocks of XORed data in network byte order
-        yield (filesize, blocksize, blockseed, int.to_bytes(block_data, blocksize, sys.byteorder))
+from lt import encoder, sampler
 
 def run(fn, blocksize, seed, c, delta):
     """Run the encoder until the channel is broken, signalling that the 
     receiver has successfully reconstructed the file
     """
 
-    for block in encoder(fn, blocksize, seed, c, delta):
-        sys.stdout.buffer.write(pack('!III%ss'%blocksize, *block))
+    for block in encoder.encode(fn, blocksize, seed, c, delta):
+        sys.stdout.buffer.write(block)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser("encoder")
     parser.add_argument('file', help='the source file to encode')
     parser.add_argument('blocksize', metavar='block-size', 
                                      type=int, 
@@ -80,11 +43,11 @@ if __name__ == '__main__':
                                 help='the initial seed for the random number generator')
     parser.add_argument('c', type=float,
                              nargs="?",
-                             default=lt_sampler.PRNG_C,
+                             default=sampler.PRNG_C,
                              help='degree sampling distribution tuning parameter')
     parser.add_argument('delta', type=float,
                                  nargs="?",
-                                 default=lt_sampler.PRNG_DELTA,
+                                 default=sampler.PRNG_DELTA,
                                  help='degree sampling distribution tuning parameter')
     args = parser.parse_args()
 

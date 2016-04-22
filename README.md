@@ -26,6 +26,8 @@ with open(filename, 'rb') as f:
 ## Decoding
 -----------
     
+The decoder reads the header, then the body, of each incoming block and conducts all possible steps in the belief propagation algorithm on a representation of the source node/check node graph that become possible given the new check node. This is done using an online algorithm, which computes the appropriate messages incrementally and passes them eagerly as the value of source nodes is resolved. Thus, the decoder will finish decoding once it has read only as many blocks is necessary in the stream to decode the file, and it seems to scale well as the file size, and block size increase.
+
 ```python
 from sys import stdin
 from lt import decode
@@ -46,8 +48,6 @@ decoder.stream_dump(some_out_stream)
 # Get entire transmission as bytes
 data = decoder.bytes_dump()
 ```
-The decoder reads the header, then the body, of each incoming block and conducts all possible steps in the belief propagation algorithm on a representation of the source node/check node graph that become possible given the new check node. This is done using an online algorithm, which computes the appropriate messages incrementally and passes them eagerly as the value of source nodes is resolved. Thus, the decoder will finish decoding once it has read only as many blocks is necessary in the stream to decode the file, and it seems to scale well as the file size, and block size increase.
-
 ## Commandline Usage
 ------------
 

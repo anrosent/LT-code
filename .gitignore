@@ -1,13 +1,8 @@
-# ignore reference sols
-reference
-
-# Ignore testing files
-*.dat
-
-
+# Following section ignores files for python <<<<<<<<<
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
 
 # C extensions
 *.so
@@ -20,6 +15,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+.eggs/
 lib/
 lib64/
 parts/
@@ -43,9 +39,11 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .coverage
+.coverage.*
 .cache
 nosetests.xml
 coverage.xml
+*,cover
 
 # Translations
 *.mo
@@ -59,9 +57,5 @@ docs/_build/
 
 # PyBuilder
 target/
-[._]*.s[a-w][a-z]
-[._]s[a-w][a-z]
-*.un~
-Session.vim
-.netrwhist
-*~
+
+# End ignores for python >>>>>>>>>>>>

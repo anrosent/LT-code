@@ -19,7 +19,7 @@ from lt import encode
 block_size = 1024
 with open(filename, 'rb') as f:
     for block in encode.encoder(f, block_size):
-        sys.stdout.buffer.write(block)
+        stdout.buffer.write(block)
 ```
 
 ## Decoding
@@ -31,7 +31,7 @@ from sys import stdin
 from lt import decode
 
 # Block to fully decode transmission incoming on stdin
-data = decode.decode(sys.stdin.buffer)
+data = decode.decode(stdin.buffer)
 
 # Feed the decoder as blocks come in
 decoder = decode.LtDecoder()

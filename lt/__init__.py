@@ -1,1 +1,1 @@
-from lt import encoder, decoder
+from lt import encode, decode

@@ -9,14 +9,14 @@ from ctypes import c_int
 from collections import defaultdict
 from math import ceil
 
-from lt import decoder 
+from lt import decode
  
 def run(stream=sys.stdin.buffer):
     """Reads from stream, applying the LT decoding algorithm
     to incoming encoded blocks until sufficiently many blocks
     have been received to reconstruct the entire file.
     """
-    payload = decoder.decode(stream)
+    payload = decode.decode(stream)
     sys.stdout.write(payload.decode('utf8'))
 
 if __name__ == '__main__':

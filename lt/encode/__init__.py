@@ -13,7 +13,7 @@ def get_blocks(f, blocksize):
     return len(f_bytes), blocks
 
 
-def encode(fn, blocksize, seed, c, delta):
+def encoder(fn, blocksize, seed=2067261, c=0.1, delta=0.5):
     """Generates an infinite sequence of blocks to transmit
     to the receiver
     """

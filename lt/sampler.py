@@ -20,10 +20,6 @@ PRNG_A = 16807
 PRNG_M = (1 << 31) - 1
 PRNG_MAX_RAND = PRNG_M - 1
 
-# Default Tuning Parameters for Robust Soliton Distribution
-PRNG_C = 0.1
-PRNG_DELTA = 0.5
-
 def gen_tau(S, K, delta):
     """The Robust part of the RSD, we precompute an
     array for speed

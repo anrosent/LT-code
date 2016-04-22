@@ -81,7 +81,9 @@ class BlockGraph(object):
 
 class LtDecoder(object):
 
-    def __init__(self):
+    def __init__(self, c=0.1, delta=0.5):
+        self.c = c
+        self.delta = delta
         self.K = 0
         self.filesize = 0
         self.blocksize = 0
@@ -103,7 +105,7 @@ class LtDecoder(object):
 
             self.K = ceil(filesize/blocksize)
             self.block_graph = BlockGraph(self.K)
-            self.prng = sampler.PRNG(params=(self.K, sampler.PRNG_DELTA, sampler.PRNG_C))
+            self.prng = sampler.PRNG(params=(self.K, self.delta, self.c))
             self.initialized = True
 
         # Run PRNG with given seed to figure out which blocks were XORed to make received data

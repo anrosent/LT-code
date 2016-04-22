@@ -21,14 +21,14 @@ import argparse
 import sys
 import time
 
-from lt import encoder, sampler
+from lt import encode, sampler
 
 def run(fn, blocksize, seed, c, delta):
     """Run the encoder until the channel is broken, signalling that the 
     receiver has successfully reconstructed the file
     """
 
-    for block in encoder.encode(fn, blocksize, seed, c, delta):
+    for block in encode.encoder(fn, blocksize, seed, c, delta):
         sys.stdout.buffer.write(block)
 
 if __name__ == '__main__':
@@ -43,11 +43,11 @@ if __name__ == '__main__':
                                 help='the initial seed for the random number generator')
     parser.add_argument('c', type=float,
                              nargs="?",
-                             default=sampler.PRNG_C,
+                             default=0.1,
                              help='degree sampling distribution tuning parameter')
     parser.add_argument('delta', type=float,
                                  nargs="?",
-                                 default=sampler.PRNG_DELTA,
+                                 default=0.5,
                                  help='degree sampling distribution tuning parameter')
     args = parser.parse_args()
 

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-python3 -m lt.decoder "$@"
+python3 -m lt.decode "$@"

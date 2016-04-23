@@ -43,11 +43,11 @@ if __name__ == '__main__':
                                 help='the initial seed for the random number generator')
     parser.add_argument('c', type=float,
                              nargs="?",
-                             default=0.1,
+                             default=sampler.DEFAULT_C,
                              help='degree sampling distribution tuning parameter')
     parser.add_argument('delta', type=float,
                                  nargs="?",
-                                 default=0.5,
+                                 default=sampler.DEFAULT_DELTA,
                                  help='degree sampling distribution tuning parameter')
     args = parser.parse_args()
 

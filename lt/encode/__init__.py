@@ -1,4 +1,5 @@
 import sys
+from random import randint
 from struct import pack
 
 from lt import sampler
@@ -13,10 +14,14 @@ def get_blocks(f, blocksize):
     return len(f_bytes), blocks
 
 
-def encoder(fn, blocksize, seed=2067261, c=0.1, delta=0.5):
+def encoder(fn, blocksize, seed=None, c=sampler.DEFAULT_C, delta=sampler.DEFAULT_DELTA):
     """Generates an infinite sequence of blocks to transmit
     to the receiver
     """
+
+    # Generate seed if not provided
+    if seed is None:
+        seed = randint(0, sys.maxsize)
 
     # get file blocks
     with open(fn, 'rb') as f:

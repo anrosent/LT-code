@@ -14,6 +14,8 @@ same PRNG parameters below.
 """
 from math import log, floor, sqrt
 
+DEFAULT_C = 0.1
+DEFAULT_DELTA = 0.5
 
 # Parameters for Pseudorandom Number Generator
 PRNG_A = 16807

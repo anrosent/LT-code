@@ -81,7 +81,7 @@ class BlockGraph(object):
 
 class LtDecoder(object):
 
-    def __init__(self, c=0.1, delta=0.5):
+    def __init__(self, c=sampler.DEFAULT_C, delta=sampler.DEFAULT_DELTA):
         self.c = c
         self.delta = delta
         self.K = 0
@@ -157,9 +157,9 @@ def read_blocks(stream):
         yield (header, block)
 
     
-def decode(in_stream, out_stream=None):
+def decode(in_stream, out_stream=None, **kwargs):
 
-    decoder = LtDecoder()
+    decoder = LtDecoder(**kwargs)
 
     # Begin forever loop
     for lt_block in read_blocks(in_stream):

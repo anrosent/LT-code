@@ -3,7 +3,7 @@ LT-code
 anrosent
 
 Completed for Brown University course cs168: Computer Networks.
-This is an implementation of a Luby Transform code in Python, consisting of two executables, one for each encoding and decoding files. The sampling code is pulled into a library shared between the two executables.
+This is an implementation of a Luby Transform code in Python, consisting of two executables, one for each encoding and decoding files. These are thin wrappers around a core stream/file API.
 
 ## Encoding
 

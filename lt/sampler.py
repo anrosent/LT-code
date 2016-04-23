@@ -71,6 +71,25 @@ class PRNG(object):
         self.K = K
         self.cdf = gen_rsd_cdf(K, delta, c)
 
+    def _get_next(self):
+        """Executes the next iteration of the PRNG
+        evolution process, and returns the result
+        """
+
+        self.state = PRNG_A * self.state % PRNG_M
+        return self.state
+
+    def _sample_d(self):
+        """Samples degree given the precomputed
+        distributions above and the linear PRNG output
+        """
+
+        p = self._get_next() / PRNG_MAX_RAND
+        for ix, v in enumerate(self.cdf):
+            if v > p:
+                return ix + 1
+        return ix + 1
+
     def set_seed(self, seed):
         """Reset the state of the PRNG to the 
         given seed
@@ -78,20 +97,7 @@ class PRNG(object):
 
         self.state = seed
 
-    def get_next(self):
-        """Executes the next iteration of the PRNG
-        evolution process, and returns the result
-        """
-
-        self.state = PRNG_A * self.state % PRNG_M
-        return self.state
     
-    def get_state(self):
-        """Returns current state of the linear PRNG
-        """
-
-        return self.state
-
     def get_src_blocks(self, seed=None):
         """Returns the indices of a set of `d` source blocks
         sampled from indices i = 1, ..., K-1 uniformly, where
@@ -106,20 +112,9 @@ class PRNG(object):
         have = 0
         nums = set()
         while have < d:
-            num = self.get_next() % self.K
+            num = self._get_next() % self.K
             if num not in nums:
                 nums.add(num)
                 have += 1
         return blockseed, d, nums
 
-    # Samples from the CDF of mu
-    def _sample_d(self):
-        """Samples degree given the precomputed
-        distributions above and the linear PRNG output
-        """
-
-        p = self.get_next() / PRNG_MAX_RAND
-        for ix, v in enumerate(self.cdf):
-            if v > p:
-                return ix + 1
-        return ix + 1

@@ -66,7 +66,7 @@ class PRNG(object):
         """Provide RSD parameters on construction
         """
 
-        self.seed = None # Seed is set by interfacing code using set_seed
+        self.state = None  # Seed is set by interfacing code using set_seed
         K, delta, c = params
         self.K = K
         self.cdf = gen_rsd_cdf(K, delta, c)
@@ -76,7 +76,6 @@ class PRNG(object):
         given seed
         """
 
-        self.seed = seed
         self.state = seed
 
     def get_next(self):

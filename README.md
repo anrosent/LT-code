@@ -1,9 +1,9 @@
 LT-code
 =======
-anrosent
 
-Completed for Brown University course cs168: Computer Networks.
 This is an implementation of a Luby Transform code in Python, consisting of two executables, one for each encoding and decoding files. These are thin wrappers around a core stream/file API.
+
+See _D.J.C, MacKay, 'Information theory, inference, and learning algorithms. Cambridge University Press, 2003_
 
 ## Encoding
 

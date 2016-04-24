@@ -14,7 +14,7 @@ def get_blocks(f, blocksize):
     return len(f_bytes), blocks
 
 
-def encoder(fn, blocksize, seed=None, c=sampler.DEFAULT_C, delta=sampler.DEFAULT_DELTA):
+def encoder(f, blocksize, seed=None, c=sampler.DEFAULT_C, delta=sampler.DEFAULT_DELTA):
     """Generates an infinite sequence of blocks to transmit
     to the receiver
     """
@@ -24,8 +24,7 @@ def encoder(fn, blocksize, seed=None, c=sampler.DEFAULT_C, delta=sampler.DEFAULT
         seed = randint(0, sys.maxsize)
 
     # get file blocks
-    with open(fn, 'rb') as f:
-        filesize, blocks = get_blocks(f, blocksize)
+    filesize, blocks = get_blocks(f, blocksize)
 
     # init stream vars
     K = len(blocks)

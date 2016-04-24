@@ -28,8 +28,9 @@ def run(fn, blocksize, seed, c, delta):
     receiver has successfully reconstructed the file
     """
 
-    for block in encode.encoder(fn, blocksize, seed, c, delta):
-        sys.stdout.buffer.write(block)
+    with open(fn, 'rb') as f:
+        for block in encode.encoder(f, blocksize, seed, c, delta):
+            sys.stdout.buffer.write(block)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("encoder")

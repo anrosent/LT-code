@@ -4,7 +4,7 @@ from struct import pack
 
 from lt import sampler
 
-def get_blocks(f, blocksize):
+def _split_file(f, blocksize):
     """Block file byte contents into blocksize chunks, padding last one if necessary
     """
 
@@ -24,7 +24,7 @@ def encoder(f, blocksize, seed=None, c=sampler.DEFAULT_C, delta=sampler.DEFAULT_
         seed = randint(0, sys.maxsize)
 
     # get file blocks
-    filesize, blocks = get_blocks(f, blocksize)
+    filesize, blocks = _split_file(f, blocksize)
 
     # init stream vars
     K = len(blocks)

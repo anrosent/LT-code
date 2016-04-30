@@ -8,7 +8,7 @@ config = {
     'author': 'Anson Rosenthal',
     'url': 'https://github.com/anrosent/LT-Code',
     'author_email': 'anson.rosenthal@gmail.com',
-    'version': '0.3.1',
+    'version': '0.3.2',
     'packages': ['lt', 'lt.encode', 'lt.decode'],
     'scripts': [],
     'name': 'lt-code'

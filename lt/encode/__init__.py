@@ -21,7 +21,7 @@ def encoder(f, blocksize, seed=None, c=sampler.DEFAULT_C, delta=sampler.DEFAULT_
 
     # Generate seed if not provided
     if seed is None:
-        seed = randint(0, sys.maxsize)
+        seed = randint(0, 1 << 31 - 1)
 
     # get file blocks
     filesize, blocks = _split_file(f, blocksize)

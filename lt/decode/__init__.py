@@ -136,13 +136,13 @@ class LtDecoder(object):
         """
         return self.block_graph.add_block(src_blocks, block)
 
-def read_header(stream):
+def _read_header(stream):
     """Read block header from network
     """
     header_bytes = stream.read(12)
     return unpack('!III', header_bytes)
 
-def read_block(blocksize, stream):
+def _read_block(blocksize, stream):
     """Read block data from network into integer type
     """
     blockdata = stream.read(blocksize)
@@ -152,10 +152,13 @@ def read_blocks(stream):
     """Generate parsed blocks from input stream
     """
     while True:
-        header = read_header(stream)
-        block  = read_block(header[1], stream)
+        header = _read_header(stream)
+        block  = _read_block(header[1], stream)
         yield (header, block)
 
+# TODO: NO validation here that the bytes consist of a *single* block
+def block_from_bytes(bts):
+    return next(read_blocks(io.BytesIO(bts)))
     
 def decode(in_stream, out_stream=None, **kwargs):
 

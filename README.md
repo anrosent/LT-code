@@ -48,8 +48,17 @@ data = decoder.bytes_dump()
 ```
 ## Commandline Usage
 
-    To run the encoder, invoke the following from the shell
-    $ ./bin/encoder <file> <blocksize> <seed> [c] [delta]
+To run the encoder, invoke the following from the shell
+```
+$ ./bin/encoder <file> <blocksize> [seed] [c] [delta]
+```
 
-    To run the decoder, run the following
-    $ ./bin/decoder 
+For example, the following streams the encoding of `file.txt` to stdout in 64B blocks.
+```
+$ ./bin/encoder ./file.txt 64
+```
+
+To run the decoder on stdin, run the following
+```
+$ ./bin/decoder 
+```

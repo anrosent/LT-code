@@ -27,24 +27,28 @@ with open(filename, 'rb') as f:
 The decoder reads the header, then the body, of each incoming block and conducts all possible steps in the belief propagation algorithm on a representation of the source node/check node graph that become possible given the new check node. This is done using an online algorithm, which computes the appropriate messages incrementally and passes them eagerly as the value of source nodes is resolved. Thus, the decoder will finish decoding once it has read only as many blocks is necessary in the stream to decode the file, and it seems to scale well as the file size, and block size increase.
 
 ```python
-from sys import stdin
+from sys import stdin, stdout
 from lt import decode
 
-# Block to fully decode transmission incoming on stdin
+# Usage 1: Blocking
+# Blocks until decoding is complete, returns bytes
 data = decode.decode(stdin.buffer)
 
-# Feed the decoder as blocks come in
+
+# Usage 2: Incremental
+# Consume blocks in a loop, breaking when finished
 decoder = decode.LtDecoder()
-for block in decode.read_blocks(some_stream):
+for block in decode.read_blocks(stdin.buffer):
     decoder.consume_block(block)
     if decoder.is_done():
        break 
 
-# Write bytes payload to stream
-decoder.stream_dump(some_out_stream)
-
-# Get entire transmission as bytes
+# You can collect the decoded transmission as bytes
 data = decoder.bytes_dump()
+
+# Or You can write the output directly to another stream
+decoder.stream_dump(sys.stdout.buffer)
+
 ```
 ## Commandline Usage
 
